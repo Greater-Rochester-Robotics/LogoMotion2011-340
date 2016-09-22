@@ -1,0 +1,667 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package edu.wpi.first.wpilibj.templates;
+
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.DriverStationLCD;
+import edu.wpi.first.wpilibj.DriverStationEnhancedIO;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DigitalInput;
+
+
+/**
+ *
+ * @author programmers
+ * @version %I
+ */
+public class HumanIO {
+
+   private static Joystick leftJoy;
+   private static Joystick rightJoy;
+   private static Joystick testJoy;
+   //private static DriverStationEnhancedIO dseio;
+   private  static DriverStationLCD lcd = DriverStationLCD.getInstance();
+   private  static DriverStationEnhancedIO dseio = DriverStation.getInstance().getEnhancedIO();
+   private static double leftJoyYValue,rightJoyYValue;
+   /** Left Joystick is assigned to port {@value #lclLeftJoyValue}. */
+   public static final int lclLeftJoyValue  = 1;
+   /** Right Joystick is assigned to port {@value #lclRightJoyValue}. */
+   public static final int lclRightJoyValue = 2;
+   private static boolean shiftButton;
+   private static boolean shiftButton2;
+   public static int GROUND_VAL   =-5;    //0
+   public static int BOT_VAL      =-3;    //2
+   public static int MID_VAL      = 1;   //10
+   public static int TOP_VAL      = 3;   //14
+   public static int HUMAN_VAL    =-1;    //6
+//   private static DigitalInput grdLED;
+//   private static DigitalInput botLED;
+//   private static DigitalInput hmnLED;
+//   private static DigitalInput midLED;
+//   private static DigitalInput topLED;
+   public static final int ARM_STOP     = 0xffff;
+   public static final int ARM_DOWN     = 0xfffe;
+   public static final int ARM_UP       = 0xfffd;
+   //public static final int ARM_POS_DIF  = 2;
+   public static double topPositionAn,botPositionAn,midPositionAn,hmnPositionAn,grdPositionAn,armTiltUpAn;
+   public static boolean topPosition;
+   public static boolean botPosition;
+   public static boolean midPosition;
+   public static boolean hmnPosition;
+   public static boolean grdPosition;
+   public static boolean armStopButton;
+   public static boolean armUpButton;
+   public static boolean armDnButton;
+   public static boolean armTiltSwitch;
+   public static boolean armTiltUpSwitch;
+   //public static boolean openGripperButton;
+   public static boolean spinTubeUpButton;
+   public static boolean spinTubeDownButton;
+   public static boolean spitOutTubeButton;
+   public static boolean stopSpinningTubeButton;
+   //public static boolean closeGripperButton;
+   public static boolean miniBotAlignInButton;
+   public static boolean miniBotAlignOutButton;
+   public static boolean miniBotDeployInButton;
+   public static boolean miniBotDeployOutButton;
+
+   public static boolean driveInvertButton;
+   public static boolean driveInvertButton2;
+   public static final int grdLEDPort = 8;
+   public static final int botLEDPort = 4;
+   public static final int hmnLEDPort = 5;
+   public static final int midLEDPort = 7;
+   public static final int topLEDPort = 6;
+   public static int trgt;
+   public static int curr;
+   /**public final static double GROUND    = -1;
+   public final static double LOW       = -0.5;
+   public final static double MIDDLE    = 0.0;
+   public final static double TOP       = 0.5;
+   public final static double HUMAN     = 1;
+   public final static double TOLERANCE =.1;*/
+
+
+    /**
+     * Creates Joysticks and assigns to local references.<br>
+     *           Assigns switches to local references
+     */
+    public HumanIO()
+    {
+         leftJoy = new Joystick(lclLeftJoyValue);
+         rightJoy = new Joystick (lclRightJoyValue);
+         testJoy = new Joystick (3); // This is a hack job
+    }
+
+    /*
+     *
+     */
+    public static void retrieveValues()
+    {
+        try {
+            //System.out.println("here 1");
+            leftJoyYValue = leftJoy.getY();
+            //System.out.println("here 2");
+            rightJoyYValue = rightJoy.getY();
+            //System.out.println("here 3");
+            shiftButton = leftJoy.getRawButton(1);
+            shiftButton2 = rightJoy.getRawButton(1);
+            //System.out.println("here 4");
+            //openGripperButton  = rightJoy.getRawButton(1);
+            spinTubeUpButton = !dseio.getDigital(6)||
+                                leftJoy.getRawButton(4)||
+                                rightJoy.getRawButton(4);
+            //System.out.println("here 5");
+            //closeGripperButton = rightJoy.getRawButton(3);
+            spinTubeDownButton = !dseio.getDigital(8)||
+                                  leftJoy.getRawButton(5)||
+                                  rightJoy.getRawButton(5);
+            //System.out.println("here 6");
+            //stopSpinningTubeButton=rightJoy.getRawButton(2);
+            //armStopButton=testJoy.getRawButton(8);
+            armTiltSwitch = !dseio.getDigital(5); //leftJoy.getRawButton(7);
+            //armTiltUpSwitch = leftJoy.getRawButton(8);
+            armTiltUpAn = dseio.getAnalogIn(7);
+            armUpButton = !dseio.getDigital(1);
+            armDnButton = !dseio.getDigital(7);
+            //System.out.println("here 7");
+            //ctrBot=rightJoy.getRawButton(6);
+            hmnPositionAn = dseio.getAnalogIn(3);
+            grdPositionAn = dseio.getAnalogIn(6);
+            botPositionAn = dseio.getAnalogIn(2);
+            midPositionAn = dseio.getAnalogIn(4);
+            topPositionAn = dseio.getAnalogIn(1);
+            miniBotAlignOutButton = dseio.getDigital(3);
+            miniBotDeployOutButton = !dseio.getDigital(4);
+            driveInvertButton = leftJoy.getRawButton(3);
+            driveInvertButton2 = rightJoy.getRawButton(3);
+//            grdLED  = new DigitalInput(grdLEDPort);
+//            botLED  = new DigitalInput(botLEDPort);
+//            hmnLED  = new DigitalInput(hmnLEDPort);
+//            midLED  = new DigitalInput(midLEDPort);
+//            topLED  = new DigitalInput(topLEDPort);
+            //dseio = DriverStation.getInstance().getEnhancedIO();
+        } catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException) {
+        }
+    }
+
+    public void setArmLED()
+    {
+        trgt     = RobotIO.getArmEncoder();
+        curr    = getElevatorSwitchValue();
+        if(trgt != TOP_VAL && curr != TOP_VAL)
+        {
+            try
+            {
+                //dseio.setLED(topLEDPort, false);
+                dseio.setDigitalOutput(topLEDPort, false);
+                //System.out.print("Top LED Off");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(curr == TOP_VAL)
+        {
+            try
+            {
+                //dseio.setLED(topLEDPort, true);
+                dseio.setDigitalOutput(topLEDPort, true);
+                //System.out.print(" Top LED On");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(trgt == TOP_VAL)
+        {
+            blinkLED(topLEDPort);
+            //System.out.println(" Top LED Blinking");
+        }
+        if(trgt != MID_VAL && curr != MID_VAL)
+        {
+            try
+            {
+                //dseio.setLED(midLEDPort, false);
+                dseio.setDigitalOutput(midLEDPort, false);
+                //System.out.print("Mid LED Off");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(curr == MID_VAL)
+        {
+            try
+            {
+                //dseio.setLED(midLEDPort, true);
+                dseio.setDigitalOutput(midLEDPort, true);
+                //System.out.print(" Mid LED On");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(trgt == MID_VAL)
+        {
+            blinkLED(midLEDPort);
+            //System.out.println(" Mid LED Blinking");
+        }
+        if(trgt != HUMAN_VAL && curr != HUMAN_VAL)
+        {
+            try
+            {
+                //dseio.setLED(hmnLEDPort, false);
+                dseio.setDigitalOutput(hmnLEDPort, false);
+                //System.out.print("Human LED Off");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(curr == HUMAN_VAL)
+        {
+            try
+            {
+                //dseio.setLED(hmnLEDPort, true);
+                dseio.setDigitalOutput(hmnLEDPort, true);
+                //System.out.print(" Human LED On");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(trgt == HUMAN_VAL)
+        {
+            blinkLED(hmnLEDPort);
+            //System.out.println(" Human LED Blinking");
+        }
+        if(trgt != BOT_VAL && curr != BOT_VAL)
+        {
+            try
+            {
+                //dseio.setLED(botLEDPort, false);
+                dseio.setDigitalOutput(botLEDPort, false);
+                //System.out.print("Bot LED Off");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(curr == BOT_VAL)
+        {
+            try
+            {
+                //dseio.setLED(botLEDPort, true);
+                dseio.setDigitalOutput(botLEDPort, true);
+                //System.out.print(" Bot LED On");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(trgt == BOT_VAL)
+        {
+            blinkLED(botLEDPort);
+            //System.out.println(" Bot LED Blinking");
+        }
+        if(trgt != GROUND_VAL && curr != GROUND_VAL)
+        {
+            try
+            {
+                //dseio.setLED(grdLEDPort, false);
+                dseio.setDigitalOutput(grdLEDPort, false);
+                //System.out.print("Ground LED Off");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(curr == GROUND_VAL)
+        {
+            try
+            {
+                //dseio.setLED(grdLEDPort, true);
+                dseio.setDigitalOutput(grdLEDPort, true);
+                //System.out.print(" Ground LED On");
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(trgt == GROUND_VAL)
+        {
+            blinkLED(grdLEDPort);
+            //System.out.println(" Ground LED Blinking");
+        }
+    }
+
+    public static final int blinkTime = 1000;
+    int i = 0;
+    public void blinkLED(int x)
+    {
+        i++;
+        if(i%blinkTime >= (blinkTime/2))
+        {
+            try
+            {
+                //dseio.setLED(x, true);
+                dseio.setDigitalOutput(x, true);
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+        else if(i%blinkTime > (blinkTime/2))
+        {
+            try
+            {
+                //dseio.setLED(x, false);
+                dseio.setDigitalOutput(x, false);
+            }
+            catch (DriverStationEnhancedIO.EnhancedIOException enhancedIOException)
+            {
+
+            }
+        }
+    }
+
+    public static void getArmPositionInputs()
+    {
+            if (hmnPositionAn < .9) {
+                hmnPosition = true;
+
+            } else {
+                hmnPosition = false;
+
+
+            }
+            if (grdPositionAn < .9) {
+                grdPosition = true;
+
+            } else {
+                grdPosition = false;
+
+            }
+            if (botPositionAn < .9) {
+                botPosition = true;
+
+            } else {
+                botPosition = false;
+
+            }
+            if (midPositionAn < .9) {
+                midPosition = true;
+
+            } else {
+                midPosition = false;
+
+            }
+            if (topPositionAn < .9) {
+                topPosition = true;
+
+            } else {
+                topPosition = false;
+
+            }
+            if (armTiltUpAn < .9) {
+                armTiltUpSwitch = true;
+
+            } else {
+                armTiltUpSwitch = false;
+
+            }
+
+    }
+
+    public static void test()
+    {
+//        System.out.print("hmnPosition: " + hmnPosition);
+//        System.out.print("  grdPosition: " + grdPosition);
+//        System.out.print("  topPosition: " + topPosition);
+//        System.out.print("  midPosition: " + midPosition);
+//        System.out.println("  botPosition: " + botPosition);
+        //System.out.print(" armUp:"+armUpButton);
+        //System.out.println("armDown"+armDnButton);
+//        System.out.print(" Tilt:" + armTiltSwitch);
+//        System.out.print(" TubeDown:" + spinTubeDownButton);
+//        System.out.print(" TubeUp:" + spinTubeUpButton);
+//        System.out.println(" armTiltUp:" + armTiltUpSwitch);
+//        System.out.print(" miniBotAlign:" + miniBotAlignOutButton);
+//        System.out.println(" miniBotDeploy:" + miniBotDeployOutButton);
+
+    }
+
+
+    boolean getArmOverrideBut() {
+        return false;//TODO: make this work correctly
+    }
+    boolean getArmTiltSwitch() {
+        return armTiltSwitch;
+    }
+    boolean getArmTiltUpSwitch() {
+        return armTiltUpSwitch;
+    }
+
+    public static int tgt = ARM_STOP;
+    public static int prev = ARM_STOP;
+    public static int getElevatorSwitchValue()
+    {
+        if(armUpButton && !RobotIO.getArmTiltUpValue())
+        {
+            tgt=prev=ARM_UP;
+        }
+        else if(armDnButton && !RobotIO.getArmTiltUpValue())
+        {
+            tgt=prev=ARM_DOWN;
+        }
+        else if(botPosition)
+        {
+            tgt=prev=BOT_VAL;
+            //System.out.println("Going to Position 1:" + RobotIO.getArmEncoder());
+        }
+        else if(midPosition)
+        {
+            tgt=prev=MID_VAL;
+            //System.out.println("Going to Position 2:" + RobotIO.getArmEncoder());
+        }
+        else if(topPosition)
+        {
+            tgt=prev=TOP_VAL;
+            //System.out.println("Going to Position 3:" + RobotIO.getArmEncoder());
+        }
+        else if(grdPosition)
+        {
+            tgt=prev=GROUND_VAL;
+            //System.out.println("Going to Position 0:" + RobotIO.getArmEncoder());
+        }
+        else if(hmnPosition)
+        {
+            tgt=prev=HUMAN_VAL;
+            //System.out.println("Going to Position 4:" + RobotIO.getArmEncoder());
+        }
+        else if(prev == ARM_UP || prev == ARM_DOWN)
+        {
+            tgt=prev=ARM_STOP;
+        }
+        return tgt;
+    }
+
+    public static int getDseioArmPosition()
+    {
+        return HumanIOtemp.getElevatorSwitchValue();
+    }
+
+    public static boolean getShiftButton()
+    {
+        return shiftButton;
+    }
+
+    public static boolean getShiftButton2()
+    {
+        return shiftButton2;
+    }
+    public static boolean getMiniBotAlignOutButton()
+    {
+        return miniBotAlignOutButton;
+    }
+
+    public static boolean getMiniBotAlignInButton()
+    {
+        return miniBotAlignInButton;
+    }
+
+    public static boolean getMiniBotDeployOutButton()
+    {
+        return miniBotDeployOutButton;
+    }
+
+    public static boolean getMiniBotDeployInButton()
+    {
+        return miniBotDeployInButton;
+    }
+    /*
+    public static boolean getOpenGripperButton()
+    {
+        return openGripperButton;
+    }
+    public static boolean getCloseGripperButton()
+    {
+        return closeGripperButton;
+    }
+     */
+
+    public static boolean getSpinTubeUpButton()
+    {
+        return spinTubeUpButton;
+    }
+    public static boolean getSpinTubeDownButton()
+    {
+        return spinTubeDownButton;
+    }
+
+    public static boolean getStopSpinningTubeButton()
+    {
+         return stopSpinningTubeButton;
+    }
+
+    public static double getLeftJoyY()
+    {
+        return leftJoyYValue;
+    }
+
+    public static double getRightJoyY()
+    {
+        return rightJoyYValue;
+    }
+
+/****************
+ * BEGIN DRIVER STATION LCD CODE
+ *
+ * Author: Jackson Anderson
+ *******************/
+
+    public void printLCD(DriverStationLCD.Line line,int startPosition ,String text)
+    {
+        lcd.println(line,startPosition,text);
+    }
+
+    public void updateLCD()
+    {
+        lcd.updateLCD();
+    }
+
+    boolean driveInvert() {
+        if (driveInvertButton || driveInvertButton2)
+            return true;
+        else
+            return false;
+    }
+
+
+
+}
+/*        if(lRBottom && lRTop)
+        {
+            if(lRMidCnt < maxCnt)
+            {
+                lRMidCnt++;
+            }
+            lRTopCnt=lRBotCnt=ctrTopCnt=ctrMidCnt=ctrBotCnt=grdCnt=rstCnt=0;
+        }
+        else if(lRBottom)
+        {
+            if(lRBotCnt < maxCnt)
+            {
+                lRBotCnt++;
+            }
+            lRTopCnt=lRMidCnt=ctrTopCnt=ctrMidCnt=ctrBotCnt=grdCnt=rstCnt=0;
+        }
+        else if(lRTop)
+        {
+            if(lRTopCnt < maxCnt)
+            {
+                lRTopCnt++;
+            }
+            lRMidCnt=lRBotCnt=ctrTopCnt=ctrMidCnt=ctrBotCnt=grdCnt=rstCnt=0;
+        }
+        else if(ctrTop && ctrBottom)
+        {
+            if(ctrMidCnt < maxCnt)
+            {
+                ctrMidCnt++;
+            }
+            lRTopCnt=lRBotCnt=lRMidCnt=ctrTopCnt=ctrBotCnt=grdCnt=rstCnt=0;
+        }
+        else if(ctrBottom)
+        {
+            if(ctrBotCnt < maxCnt)
+            {
+                ctrBotCnt++;
+            }
+            lRTopCnt=lRBotCnt=lRMidCnt=ctrTopCnt=ctrMidCnt=grdCnt=rstCnt=0;
+        }
+        else if(ctrTop)
+        {
+            if(ctrTopCnt < maxCnt)
+            {
+                ctrTopCnt++;
+            }
+            lRMidCnt=lRBotCnt=lRTopCnt=ctrMidCnt=ctrBotCnt=grdCnt=rstCnt=0;
+        }
+        else if(grdButton)
+        {
+            if(grdCnt < maxCnt)
+            {
+                grdCnt++;
+            }
+            lRMidCnt=lRBotCnt=lRTopCnt=ctrMidCnt=ctrBotCnt=ctrTopCnt=rstCnt=0;
+        }
+        else if(armReset)
+        {
+            if(rstCnt < maxCnt)
+            {
+                rstCnt++;
+            }
+            lRMidCnt=lRBotCnt=lRTopCnt=ctrMidCnt=ctrBotCnt=ctrTopCnt=grdCnt=0;
+        }
+        return maxCnt;
+ *
+ * private static int lRBotCnt;
+   private static int lRMidCnt;
+   private static int lRTopCnt;
+   private static int ctrBotCnt;
+   private static int ctrMidCnt;
+   private static int ctrTopCnt;
+   private static int grdCnt;
+   private static int rstCnt;
+   private static final int maxCnt=10;
+ */
+
+/**
+ * try
+        {
+            if((dseio.getAnalogIn(1) > (GROUND - TOLERANCE)) && (dseio.getAnalogIn(1) < (GROUND + TOLERANCE)))
+            {
+                return 0;
+            }
+            else if((dseio.getAnalogIn(1) > (LOW - TOLERANCE)) && (dseio.getAnalogIn(1) < (LOW + TOLERANCE)))
+            {
+                return 1;
+            }
+            else if((dseio.getAnalogIn(1) > (MIDDLE - TOLERANCE)) && (dseio.getAnalogIn(1) < (MIDDLE + TOLERANCE)))
+            {
+                return 2;
+            }
+            else if((dseio.getAnalogIn(1) > (TOP - TOLERANCE)) && (dseio.getAnalogIn(1) < (TOP + TOLERANCE)))
+            {
+                return 3;
+            }
+            else if((dseio.getAnalogIn(1) > (HUMAN - TOLERANCE)) && (dseio.getAnalogIn(1) < (HUMAN + TOLERANCE)))
+            {
+                return 4;
+            }
+            else
+            {
+                return -100;
+            }
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+ */

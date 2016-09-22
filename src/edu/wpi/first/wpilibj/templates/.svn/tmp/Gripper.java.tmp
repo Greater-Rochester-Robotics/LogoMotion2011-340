@@ -1,0 +1,192 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package edu.wpi.first.wpilibj.templates;
+import edu.wpi.first.wpilibj.Timer;
+//svn test
+/**
+ * 
+ * @author Adam Audycki
+ ******************************************************************************
+ * Buttons On Right Joystick For the Gripper
+ * 01          -->  Spin the Tube Up
+ * 02          -->  Spit Tube Out
+ * 03          -->  Spin the Tube Down
+ ******************************************************************************
+ */
+public class Gripper
+{
+    RobotIO rIO;
+    HumanIO hIO;
+    private Timer upGripperTimer;
+    private Timer downGripperTimer;
+    boolean spinTubeOutAuto;
+    private static int i;
+/**
+ * Allows you to use HumanIO and RobotIo in this program
+ * @param lclrIO >?<
+ * @param lclhIO
+ */
+  public Gripper(RobotIO lclrIO,HumanIO lclhIO)
+  {
+    this.rIO = lclrIO;
+    this.hIO = lclhIO;
+    upGripperTimer = new Timer();
+    downGripperTimer = new Timer();
+    i = 0;
+  }
+/**
+ * Allows you to spin up/down/spit out the tube
+ */
+  public void manual()
+  {
+      /*
+       * spinning tube in = -1
+       * spinning tube out = 1
+       */
+     if(hIO.getSpinTubeUpButton())
+     {
+         this.spinTubeUp();
+     }
+     else if(hIO.getSpinTubeDownButton())
+     {
+         this.spinTubeDown();
+     }
+ else if(!hIO.getSpinTubeUpButton() && !hIO.getSpinTubeDownButton() && rIO.getArmMotorValue() > 0)
+     {
+        this.spinTubeUpSlow();
+
+     }
+     else
+     {
+         this.stopSpinningTube();
+     }
+  }
+  /**
+   * sees if it can close
+   * @return
+   */
+  public boolean canClose()
+  {
+    return true;
+    /**
+     * TODO:need to find hear back from mecanical before I can code.
+     */
+  }
+/**
+ * sees if it is open
+ * @return
+ */
+  public boolean isOpen()
+  {
+    return true;
+    /*
+     * TODO:need to find hear back from mecanical before I can code.
+     */
+  }
+  /**
+   * see if it is aligned
+   */
+  public void getAlignment()
+  {
+  }
+/**
+ * spins tube ups
+ */
+  public void spinTubeUp()
+  {
+      //System.out.println("SPIN TUBE UP" + upGripperTimer.get() );
+      rIO.setGripperRollerValue(-1);
+      upGripperTimer.start();
+        if((upGripperTimer.get()>=2))
+        {
+            this.stopSpinningTube();
+            upGripperTimer.stop();
+            upGripperTimer.reset();
+        }    
+  }
+/**
+ * spin tube down
+ */
+  public void spinTubeDown()
+  {
+      //System.out.println("SPIN TUBE" + downGripperTimer.get());
+      rIO.setGripperRollerValue(1);
+      downGripperTimer.start();
+           if(downGripperTimer.get()>=2)
+           {
+               this.stopSpinningTube();
+               downGripperTimer.stop();
+               downGripperTimer.reset();
+           }
+  }
+/**
+ * stop roller
+ */
+  public void stopSpinningTube()
+  {
+      //System.out.println("STOP SPINNING TUBE" + upGripperTimer.get() + downGripperTimer.get());
+      rIO.setGripperRollerValue(0);
+  }
+  public boolean spinTubeOutAuto()
+  {
+
+      rIO.setGripperRollerValue(1);
+      if(downGripperTimer.get() == 0)
+        downGripperTimer.start();
+      System.out.println(downGripperTimer.get());
+        if(downGripperTimer.get()>= .5)
+        {
+            this.stopSpinningTube();
+            downGripperTimer.stop();
+            downGripperTimer.reset();
+            return true;                //Gripper is done spinning tube out
+        }
+        else
+            return false;               //hasn't finished spinning out yet
+  }
+
+    void spinTubeUpSlow() {
+        rIO.setGripperRollerValue(-.5);
+    }
+  /**
+   * checks to see if the tube is in the end effector. /**
+   * this is asking if the current is highter than an preexisting value.
+   * if the ultrasensor is tripped.
+   *
+   * or if thier is another type of sensor in it.
+   *
+   * @param x
+   * @param y
+   * @return
+   *
+   *
+  public boolean isTubeIn()
+  {
+          if(rIO.getTubeSensorValue())
+              return true;
+  }
+ *
+ * opens gripper
+ */
+/*
+ public void open()
+  {
+      rIO.setGripperValue(1);
+      rIO.setGripperRollerValue(1);
+     if(upGripperTimer.get()>=2)
+         rIO.setGripperRollerValue(0);
+  }
+  /**
+   * closes gripper
+ 
+  public void close()
+  {
+      rIO.setGripperValue(-1);
+      rIO.setGripperRollerValue(0);
+      this.stopSpinningTube();
+      gripperTimer.start();
+  }
+  **/
+}
